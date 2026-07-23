@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uma cartinha para você 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF7F0;
+    --blush:#FFE1E9;
+    --rose:#E7A9B4;
+    --plum:#4A3648;
+    --sage:#9FBE9A;
+    --gold:#D9A441;
+    --paper:#FFFCF8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 15% 20%, var(--blush) 0%, transparent 45%),
+      radial-gradient(circle at 85% 10%, #FCEFD9 0%, transparent 40%),
+      radial-gradient(circle at 50% 90%, #EAF3E6 0%, transparent 50%),
+      var(--cream);
+    font-family:'Lora', serif;
+    color:var(--plum);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* floating little hearts/petals ambient */
+  .petal{
+    position:fixed;
+    top:-40px;
+    font-size:18px;
+    opacity:0.5;
+    pointer-events:none;
+    animation:fall linear infinite;
+    user-select:none;
+  }
+  @keyframes fall{
+    to{ transform:translateY(110vh) rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .petal{ animation:none; display:none; }
+  }
+
+  .stage{
+    width:100%;
+    max-width:560px;
+    position:relative;
+    z-index:1;
+  }
+
+  /* --- GATE (envelope) --- */
+  .envelope-wrap{
+    background:var(--paper);
+    border-radius:22px;
+    padding:52px 40px 44px;
+    box-shadow:0 30px 60px -20px rgba(74,54,72,0.25), 0 2px 0 rgba(74,54,72,0.04) inset;
+    text-align:center;
+    border:1px solid rgba(231,169,180,0.4);
+    transition:transform .5s ease, opacity .5s ease;
+  }
+  .seal{
+    width:64px;height:64px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background:linear-gradient(160deg, var(--rose), #d88fa0);
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;
+    box-shadow:0 8px 18px -6px rgba(216,143,160,0.7);
+  }
+  h1.title{
+    font-family:'Caveat', cursive;
+    font-size:2.6rem;
+    margin:0 0 6px;
+    color:var(--plum);
+    font-weight:700;
+  }
+  p.subtitle{
+    margin:0 0 30px;
+    font-size:0.98rem;
+    color:#7a6672;
+    line-height:1.5;
+  }
+  .field-row{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  input#pw{
+    font-family:'Lora', serif;
+    font-size:1.05rem;
+    padding:14px 18px;
+    border-radius:14px;
+    border:1.5px solid #ecd7dc;
+    outline:none;
+    background:#fffdfb;
+    color:var(--plum);
+    width:230px;
+    max-width:60vw;
+    text-align:center;
+    letter-spacing:0.5px;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  input#pw:focus{
+    border-color:var(--rose);
+    box-shadow:0 0 0 4px rgba(231,169,180,0.2);
+  }
+  button#unlock{
+    font-family:'Lora', serif;
+    font-size:1rem;
+    font-weight:600;
+    padding:14px 24px;
+    border-radius:14px;
+    border:none;
+    background:var(--plum);
+    color:#fff8f2;
+    cursor:pointer;
+    transition:transform .15s ease, background .2s ease;
+  }
+  button#unlock:hover{ background:#5f4560; transform:translateY(-1px); }
+  button#unlock:active{ transform:translateY(0); }
+
+  .hint{
+    margin-top:18px;
+    font-size:0.85rem;
+    color:#b98b96;
+    min-height:20px;
+    font-family:'Lora', serif;
+  }
+  .hint.shake{ animation:shake .4s ease; color:#c26a76; }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    20%{ transform:translateX(-6px); }
+    40%{ transform:translateX(6px); }
+    60%{ transform:translateX(-4px); }
+    80%{ transform:translateX(4px); }
+  }
+
+  /* --- LETTER (revealed) --- */
+  .letter-wrap{
+    display:none;
+    background:var(--paper);
+    border-radius:22px;
+    padding:46px 38px 40px;
+    box-shadow:0 30px 60px -20px rgba(74,54,72,0.25);
+    border:1px solid rgba(231,169,180,0.4);
+    animation:openUp .6s cubic-bezier(.2,.8,.2,1);
+    position:relative;
+  }
+  @keyframes openUp{
+    from{ opacity:0; transform:translateY(18px) scale(0.98); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .letter-wrap::before{
+    content:"";
+    position:absolute;
+    top:0; left:24px; right:24px;
+    height:4px;
+    border-radius:0 0 8px 8px;
+    background:linear-gradient(90deg, var(--rose), var(--gold), var(--sage));
+    opacity:0.7;
+  }
+  h2.name{
+    font-family:'Caveat', cursive;
+    font-size:2.8rem;
+    margin:6px 0 20px;
+    color:var(--rose);
+  }
+  .body-text p{
+    font-size:1.02rem;
+    line-height:1.85;
+    margin:0 0 20px;
+    color:#3f3140;
+    text-align:left;
+    white-space:pre-line;
+  }
+  .signoff{
+    margin-top:8px;
+    font-family:'Caveat', cursive;
+    font-size:1.7rem;
+    color:var(--plum);
+    text-align:right;
+  }
+  .again{
+    display:inline-block;
+    margin-top:26px;
+    font-size:0.85rem;
+    color:#9a8492;
+    text-decoration:underline;
+    cursor:pointer;
+    background:none;
+    border:none;
+    font-family:'Lora', serif;
+  }
+
+  @media (max-width:480px){
+    .envelope-wrap, .letter-wrap{ padding:36px 22px 32px; border-radius:18px; }
+    h1.title{ font-size:2.1rem; }
+    h2.name{ font-size:2.2rem; }
+    input#pw{ width:100%; }
+    .field-row{ flex-direction:column; }
+    button#unlock{ width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="envelope-wrap" id="gate">
+    <div class="seal">💌</div>
+    <h1 class="title">tem uma cartinha te esperando</h1>
+    <p class="subtitle">digite a senha que só você sabe<br>para abrir a sua mensagem</p>
+    <div class="field-row">
+      <input type="text" id="pw" placeholder="senha" autocomplete="off" autocapitalize="off">
+      <button id="unlock">abrir</button>
+    </div>
+    <div class="hint" id="hint"></div>
+  </div>
+
+  <div class="letter-wrap" id="letter">
+    <h2 class="name" id="letter-name"></h2>
+    <div class="body-text" id="letter-body"></div>
+    <div class="signoff">com carinho 🤍</div>
+    <button class="again" id="again">fechar e tentar outra senha</button>
+  </div>
+</div>
+
+<script>
+// --- conteúdo ---
+const MESSAGES = {
+  "doce": {
+    name: "Carla",
+    paragraphs: [
+"Você é a irmã mais velha que eu não tive. Eu agradeço muito por você ser tão presente na minha vida, me aconselhando, me ouvindo e me mostrando sempre o que eu mereço.",
+"Eu desejo tudo de melhor que o Senhor tem preparado para você nessa nova fase que está chegando. Lembre-se sempre desse versículo: \"O amor é paciente, o amor é bondoso\". Eu tenho fé de que você construirá um lar bonito como o que você foi criada, porque eu oro por isso para você! Afinal, não existe lugar como a nossa casa, mas com o tempo a gente entende que nossa verdadeira casa é feita pelas pessoas que amamos e pelos momentos que construímos com elas.",
+"Por mais difíceis que os momentos possam ser na vida adulta, nossas escolhas sempre precisam ser pensadas naquilo que queremos alcançar a longo prazo. A Taylor Swift tem uma música que fala: \"Para sempre é o corte mais doce\", e isso me faz lembrar que precisamos fazer escolhas diárias pensando que existe algo maior e melhor nos esperando. Às vezes, o presente assusta mais do que deveria, mas Deus continua trabalhando no futuro que Ele preparou.",
+"Essa lembrancinha é para que, sempre que você olhar para ela, lembre-se de que existem pessoas que te amam acima de tudo pela maravilhosa pessoa que você é.",
+"Amo você e tudo aquilo que construímos juntos."
+    ]
+  },
+  "yoyok": {
+    name: "Amanda",
+    paragraphs: [
+"Você acredita que conseguimos sentir quando uma pessoa vai se tornar especial na nossa vida? Porque foi exatamente assim quando eu soube que você entraria na minha.",
+"E, a cada dia, você comprova isso sendo uma das pessoas mais presentes e ouvintes que eu poderia ter. Você, muitas vezes sem perceber, me ensina aquilo que eu mereço: ser escutado, principalmente. Me mostra que meus assuntos, mesmo quando parecem importantes apenas para mim, ainda merecem atenção e cuidado.",
+"Você está vivendo uma fase linda, uma fase que eu orei para que chegasse da forma como está acontecendo. A Taylor Swift tem uma música que diz: \"Tudo aquilo que perdemos é um passo que damos\". Talvez, na primeira vez que ouvimos, não pareça fazer tanto sentido, mas ela fala sobre processos, mudanças e amadurecimento. E esse é um processo que eu vejo acontecendo tanto em você.",
+"Você já era uma pessoa linda, mas a maternidade trouxe ainda mais luz para quem você é. A Bíblia fala: \"Um coração alegre aformoseia o rosto\", e o seu coraçãozinho chamado Felipe fez exatamente isso em você.",
+"Essa lembrancinha é para marcar essa nova fase que estamos vivendo, acompanhando o Felipe dando seus primeiros passos por aí e vendo você crescer junto com ele nessa nova versão de si mesma.",
+"Amo você e tudo aquilo que construímos juntos."
+    ]
+  },
+  "friends": {
+    name: "Lavínia",
+    paragraphs: [
+"Como o mundo pode girar tanto?",
+"Naquela época, eu deixei que outras pessoas me mostrassem quem era você, sem buscar conhecer a minha própria visão. Hoje, tenho certeza de que você é exatamente o tipo de pessoa que todos querem ter por perto.",
+"Tem um versículo da Bíblia que representa muito aquilo que eu sinto por você: \"O ferro afia o ferro, e assim o homem afia o rosto do seu amigo\". Porque é isso que você faz. Você me desafia, me ensina e me faz crescer.",
+"Eu não sei todas as coisas que você já passou ou ainda passa na vida, mas sei que elas ajudaram a construir alguém forte, alguém que sempre tem algo para falar, aconselhar ou simplesmente ouvir.",
+"Eu reclamo, pontuo, critico, mas você sempre encontra uma forma de me mostrar algo que faz eu querer ouvir mais e estar ainda mais próximo. É como a música da Taylor Swift que diz: \"Eu vivi o melhor momento da minha vida lutando contra dragões com você\". Porque, por mais problemas que apareçam, sempre conseguimos encontrar uma risada no final do dia.",
+"Espero que a gente continue escrevendo uma história bonita como essa que estamos construindo agora. Acima de tudo, você me entende. Entende onde aperta e onde dói. E eu não estou falando apenas do profissional, mas da vida.",
+"A vida é mais vívida com você ao lado.",
+"Hoje eu tenho a minha própria visão de quem você é e de como esse seu pulso firme é necessário para orientar pessoas que ainda não sabem o caminho que precisam seguir.",
+"Essa lembrancinha é para que você nunca deixe escapar as boas ideias e os ensinamentos de vida que, além de engrandecerem você, ainda ajudam tantas pessoas por aí.",
+"Amo você e tudo aquilo que construímos juntos."
+    ]
+  },
+  "irmao": {
+    name: "Letícia",
+    paragraphs: [
+"Talvez ainda não tenhamos uma relação tão profunda quanto outras pessoas que estão aqui, mas nesses quase 5 anos em que estou com a Carla, já ouvi tantas coisas boas e importantes sobre você que sinto que, de alguma forma, já somos irmãos também.",
+"Talvez existam dias em que você pense que seria melhor me conhecer apenas pela tela do celular ou apenas pelas boas histórias que você ouvia sobre mim, mas eu prometo me esforçar para que esses momentos nunca sejam maiores do que aqueles em que eu conseguir tornar a vida mais leve por aqui.",
+"Eu sei que você está vivendo um novo \"velho\" momento (risos). Por mais que você já tenha passado por essa fase antes, as coisas mudam, nós mudamos e nunca voltamos exatamente para o mesmo lugar. Por isso, desejo que você encontre crescimento nessa nova etapa e que, mesmo nos momentos difíceis, consiga pensar: \"valeu a pena\".",
+"Nos livros de Harry Potter, vemos que a amizade do trio nasceu em meio a desafios que eles enfrentaram juntos. A autora escreve: \"Há coisas que não se pode fazer junto sem acabar gostando um do outro\". E o que estamos fazendo aqui senão enfrentando os monstros diários da vida adulta?",
+"Espero que eu possa te ajudar e estar presente no que você precisar. Mesmo não sendo seu irmão de sangue, a Bíblia nos lembra que \"há amigos mais chegados que irmãos\", então acho que estamos bem.",
+"Essa lembrancinha é para que você saiba que, mesmo nas coisas simples da vida, você pode contar com amigos que torcem por você.",
+"Tenho um carinho enorme por você desde antes de te conhecer, desde quando eu só ouvia falar."
+    ]
+  }
+};
+
+function normalize(str){
+  return str
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase()
+    .trim();
+}
+
+const gate = document.getElementById('gate');
+const letter = document.getElementById('letter');
+const pwInput = document.getElementById('pw');
+const hint = document.getElementById('hint');
+const unlockBtn = document.getElementById('unlock');
+const againBtn = document.getElementById('again');
+
+function tryUnlock(){
+  const key = normalize(pwInput.value);
+  const entry = MESSAGES[key];
+  if(entry){
+    document.getElementById('letter-name').textContent = entry.name + ',';
+    document.getElementById('letter-body').innerHTML =
+      entry.paragraphs.map(p => `<p>${p}</p>`).join('');
+    gate.style.display = 'none';
+    letter.style.display = 'block';
+    hint.textContent = '';
+  } else {
+    hint.textContent = 'hmm, essa senha não é válida. tenta de novo? 🌸';
+    hint.classList.remove('shake');
+    void hint.offsetWidth;
+    hint.classList.add('shake');
+  }
+}
+
+unlockBtn.addEventListener('click', tryUnlock);
+pwInput.addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+againBtn.addEventListener('click', () => {
+  letter.style.display = 'none';
+  gate.style.display = 'block';
+  pwInput.value = '';
+  hint.textContent = '';
+  pwInput.focus();
+});
+
+// ambient floating petals
+const emojis = ['🌸','💌','🤍','✨'];
+for(let i=0;i<14;i++){
+  const p = document.createElement('div');
+  p.className = 'petal';
+  p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  p.style.left = Math.random()*100 + 'vw';
+  p.style.animationDuration = (10 + Math.random()*12) + 's';
+  p.style.animationDelay = (Math.random()*10) + 's';
+  p.style.fontSize = (14 + Math.random()*12) + 'px';
+  document.body.appendChild(p);
+}
+</script>
+</body>
+</html>
